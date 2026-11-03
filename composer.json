@@ -1,0 +1,36 @@
+{
+    "name": "alvesbeto/mysql2i",
+    "description": "Shim for the mysql_* API removed in PHP 7+, implemented on ext-mysqli for PHP 8+",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "mysql",
+        "mysqli",
+        "legacy",
+        "shim",
+        "php8"
+    ],
+    "authors": [
+        {
+            "name": "Beto Souza",
+            "homepage": "https://github.com/alvesbeto"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "ext-mysqli": "*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/mysql2i.class.php"
+        ],
+        "files": [
+            "src/mysql2i.func.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
