@@ -170,7 +170,6 @@ If the shim is included twice in one request, guards skip redefinition:
 | Symbol | Purpose |
 |--------|---------|
 | `mysql_multi_query_script($link, $script)` | Run a multi-statement SQL script via `mysqli_multi_query`, draining result sets |
-| `mysql_is_valid_link($link = null)` | Whether the link is a connected `mysqli` (or legacy `resource`) |
 | `mysql2i::resolveMysqliLink($link)` | Normalize a link to `mysqli` (advanced / internal) |
 
 See [docs/API.md](docs/API.md) for the full function list and return types.
@@ -181,7 +180,7 @@ See [docs/API.md](docs/API.md) for the full function list and return types.
 
 ### Connection handles and `is_resource()`
 
-On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `mysql_is_valid_link($link)` or `$link instanceof mysqli`. For result sets, use **`mysql_is_result($result)`** instead of `is_resource($result)`, and **`mysql_free_result_if_needed($result)`** in cleanup paths that may already be freed.
+On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `$link instanceof mysqli` (and your app’s connection bootstrap). For result sets, use **`mysql_is_result($result)`** instead of `is_resource($result)`, and **`mysql_free_result_if_needed($result)`** in cleanup paths that may already be freed.
 
 ### `mysql_close()`
 

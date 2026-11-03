@@ -32,10 +32,6 @@ Compatibility: **does not aggressively close** the connection; returns `true` in
 
 Checks the connection by running `SELECT 1` (not `mysqli_ping` alone).
 
-### `mysql_is_valid_link($link = null)`
-
-Returns `true` if `$link` (or `$currObj`) is a connected `mysqli` or a legacy `resource`.
-
 ---
 
 ## Queries
@@ -170,7 +166,6 @@ Helper methods:
 
 - **`mysql2i::resolveMysqliLink($link = null): ?mysqli`**
 - **`mysql2i::mysql_multi_query_script($link, $script): bool`**
-- **`mysql2i::mysql_is_valid_link($link = null): bool`**
 - **`mysql2i::mysql_is_result($result): bool`**
 - **`mysql2i::mysql_free_result_if_needed($result): void`**
 

@@ -1,3 +1,7 @@
+## 2026-11-03: Remove `mysql_is_valid_link`
+
+Dropped from `src/` (not historical `mysql_*`). Specs, registry (46 funcs), README, API, CHANGELOG 1.0.4 updated. Link checks: consumer bootstrap / `$link instanceof mysqli`.
+
 ## 2026-11-03: Remove Graphify from repo
 
 Removed skill, rule, `.graphifyrc`, `graphify-out/`. Agent memory stays in SDD + OKF ([project-memory-model](concepts/project-memory-model.md), method registry, specs).

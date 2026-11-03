@@ -364,11 +364,6 @@ if (!function_exists('mysql_affected_rows')) {
         return mysql2i::mysql_unbuffered_query($query, $link);
     }
 
-    function mysql_is_valid_link($link = null)
-    {
-        return mysql2i::mysql_is_valid_link($link);
-    }
-
     function mysql_is_result($result): bool
     {
         return mysql2i::mysql_is_result($result);

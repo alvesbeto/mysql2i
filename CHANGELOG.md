@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.4] - 2026-11-03
+
+### Removed
+
+- `mysql_is_valid_link()` — not part of the historical `mysql_*` API; consumers should use `$link instanceof mysqli` and app bootstrap for connection ownership.
+
 ## [1.0.3] - 2026-11-03
 
 ### Added

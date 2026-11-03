@@ -8,7 +8,7 @@ tags: [behavior, mysql-shim]
 
 Source of truth for code: `src/mysql2i.class.php`, `src/mysql2i.func.php`. This page is the **agent-facing** summary.
 
-**Per-method catalog** (all 47 functions, line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
+**Per-method catalog** (all 46 functions, line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
 
 ## Connection
 
@@ -43,7 +43,8 @@ Does not aggressively close the socket; returns `true` for compatibility with sh
 |----------|----------|
 | `mysql_errno` / `mysql_error` | Resolve link via `resolveMysqliLink`; safe defaults when no link |
 | `mysql_query` | Func: warning + `error_log` when link invalid; class: `error_log` only + `host_info` check — see **Procedural vs class** above |
-| `mysql_is_valid_link` | Accepts `mysqli` with `host_info` or legacy `resource` |
+
+Link validity for application code: use bootstrap-owned `$link` / `$currObj`, or `$link instanceof mysqli` — not a dedicated shim helper.
 
 ## Extensions (beyond classic mysql)
 

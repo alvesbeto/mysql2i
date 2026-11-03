@@ -661,22 +661,6 @@ class mysql2i
     }
 
     /**
-     * Compatible with legacy mysql links (resource) and mysqli (PHP 8+ / mysql2i).
-     */
-    public static function mysql_is_valid_link($link = null)
-    {
-        if ($link === null || $link === false) {
-            $link = self::$currObj;
-        }
-
-        if ($link instanceof mysqli) {
-            return !$link->connect_errno && isset($link->host_info);
-        }
-
-        return is_resource($link);
-    }
-
-    /**
      * Whether $result is a legacy mysql result (mysqli_result on PHP 8+).
      */
     public static function mysql_is_result($result): bool
