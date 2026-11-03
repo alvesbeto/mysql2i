@@ -171,7 +171,29 @@ $res = mysql2i::mysql_query('SELECT 1', $link);
 
 ## Manual load order
 
-1. `src/mysql2i.class.php`
+1. `src/mysql2i.class.php` (loads `Mysql2i\…` via built-in autoloader)
 2. `src/mysql2i.func.php`
 
 With Composer, only `vendor/autoload.php` is required.
+
+---
+
+## Namespace `Mysql2i`
+
+| Type | Class | Role |
+|------|-------|------|
+| Session | `LinkContext` | Current connection + close guard (backs `mysql2i::$currObj`) |
+| Helper | `ResolveMysqliLink` | Same as `mysql2i::resolveMysqliLink()` |
+| Shim | `Shim\MysqlConnect`, `Shim\MysqlQuery`, … | One class per function; call `::invoke(...)` with the same parameters as the global |
+
+Example:
+
+```php
+use Mysql2i\Shim\MysqlSelectDb;
+
+MysqlSelectDb::invoke('my_database', $link);
+```
+
+Procedural globals still apply func-layer warnings and deprecations where documented below.
+
+---

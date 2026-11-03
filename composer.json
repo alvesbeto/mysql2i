@@ -26,6 +26,9 @@
         "ext-mysqli": "*"
     },
     "autoload": {
+        "psr-4": {
+            "Mysql2i\\": "src/Mysql2i/"
+        },
         "classmap": [
             "src/mysql2i.class.php"
         ],

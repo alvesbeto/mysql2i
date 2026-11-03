@@ -157,7 +157,8 @@ Remove the old copies once autoload is in place to avoid loading the shim twice.
 
 | Mechanism | File | What it loads |
 |-----------|------|----------------|
-| `classmap` | `src/mysql2i.class.php` | Class `mysql2i` |
+| `classmap` | `src/mysql2i.class.php` | Global facade `mysql2i` (+ fallback autoload for `Mysql2i\…`) |
+| `psr-4` | `src/Mysql2i/` | One class per shim under `Mysql2i\Shim\` |
 | `files` | `src/mysql2i.func.php` | Global `mysql_*` functions and `MYSQL_*` constants |
 
 If the shim is included twice in one request, guards skip redefinition:
@@ -175,6 +176,22 @@ If the shim is included twice in one request, guards skip redefinition:
 | `mysql2i::resolveMysqliLink($link)` | Normalize a link to `mysqli` (advanced / internal) |
 
 See [docs/API.md](docs/API.md) for the full function list and return types.
+
+### Namespaced API (maintainers / new code)
+
+Namespace **`Mysql2i`**. Each legacy function has a dedicated class with a single static entrypoint:
+
+```php
+use Mysql2i\Shim\MysqlQuery;
+use Mysql2i\ResolveMysqliLink;
+
+// Same mysqli backend as mysql_query(); skips procedural trigger_error on bad link
+MysqlQuery::invoke('SELECT 1', $link);
+
+ResolveMysqliLink::invoke($link); // mysqli|null
+```
+
+Global **`mysql_*`** and **`mysql2i::`** remain the default for legacy apps.
 
 ---
 

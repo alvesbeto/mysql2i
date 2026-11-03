@@ -12,7 +12,7 @@ scope: "src/**"
 - Preserve global class name `mysql2i` and procedural `mysql_*` names for drop-in compatibility.
 - Match existing style: no drive-by reformat; surgical diffs only.
 - User-facing comments and docs in **English** ([ADR-0005](../adrs/ADR-0005-english-user-facing-docs.md)).
-- Before adding a function, grep this repo — extend existing methods on `mysql2i` first.
+- Before adding a function, grep this repo — add a `Mysql2i\Shim\Mysql*` class and a one-line delegate on global `mysql2i`.
 - After behavior change, update [../specs/shim-behavior.md](../specs/shim-behavior.md) and [../../docs/API.md](../../docs/API.md).
 
 Verify: [../runbooks/validate.md](../runbooks/validate.md).

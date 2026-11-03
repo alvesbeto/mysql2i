@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.0] - 2026-11-03
+
+### Changed
+
+- **Internal architecture:** each `mysql_*` implementation lives in `Mysql2i\Shim\{Name}::invoke()`. Shared session state: `Mysql2i\LinkContext`; link normalization: `Mysql2i\ResolveMysqliLink`.
+- **Autoload:** PSR-4 namespace `Mysql2i\` → `src/Mysql2i/` (Composer). Global `mysql2i` and procedural `mysql_*` API unchanged for consumers.
+
 ## [1.0.6] - 2026-11-03
 
 ### Documentation

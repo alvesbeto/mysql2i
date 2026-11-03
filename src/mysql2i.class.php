@@ -3,661 +3,276 @@
 /**
  * @package alvesbeto/mysql2i
  * @see     https://github.com/alvesbeto/mysql2i
+ *
+ * Legacy global facade; implementations live in Mysql2i\Shim\*.
  */
+
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'Mysql2i\\';
+    if (!str_starts_with($class, $prefix)) {
+        return;
+    }
+    $relative = substr($class, strlen($prefix));
+    $file = __DIR__ . '/Mysql2i/' . str_replace('\\', '/', $relative) . '.php';
+    if (is_file($file)) {
+        require $file;
+    }
+});
 
 if (!class_exists('mysql2i', false)) {
 
 class mysql2i
 {
     public static $currObj;
-    private static $isClosing = false;
 
     public static function mysql_affected_rows($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli) || $link->connect_errno || !isset($link->host_info)) {
-            return false;
-        }
-
-        return mysqli_affected_rows($link);
+        return \Mysql2i\Shim\MysqlAffectedRows::invoke($link);
     }
 
     public static function mysql_client_encoding($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_character_set_name($link);
+        return \Mysql2i\Shim\MysqlClientEncoding::invoke($link);
     }
 
     public static function mysql_close($link = null)
     {
-        if (self::$isClosing) {
-            return true;
-        }
-
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli) || $link->connect_errno) {
-            return true;
-        }
-
-        self::$isClosing = true;
-        // Do not close the connection here for backward compatibility.
-        // The connection is closed automatically at the end of the script.
-        return true;
+        return \Mysql2i\Shim\MysqlClose::invoke($link);
     }
 
     public static function mysql_connect($host = '', $username = '', $passwd = '', $new_link = false, $client_flags = 0)
     {
-        if (self::$currObj instanceof mysqli && !self::$currObj->connect_errno) {
-            return self::$currObj;
-        }
-
-        $link = mysqli_connect($host, $username, $passwd);
-        self::$currObj = $link;
-        self::$isClosing = false;
-
-        return $link;
+        return \Mysql2i\Shim\MysqlConnect::invoke($host, $username, $passwd, $new_link, $client_flags);
     }
 
     public static function mysql_create_db($database_name, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        $query = "CREATE DATABASE `" . $database_name . "`";
-        mysqli_query($link, $query);
-
-        if (empty(mysqli_errno($link))) {
-            return true;
-        } else {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlCreateDb::invoke($database_name, $link);
     }
 
     public static function mysql_data_seek($result, $offset)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        return mysqli_data_seek($result, $offset);
+        return \Mysql2i\Shim\MysqlDataSeek::invoke($result, $offset);
     }
 
     public static function mysql_db_name($result, $row, $field = null)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        mysqli_data_seek($result, $row);
-
-        $f = mysqli_fetch_row($result);
-
-        return $f[0];
+        return \Mysql2i\Shim\MysqlDbName::invoke($result, $row, $field);
     }
 
     public static function mysql_db_query($database, $query, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-        mysqli_select_db($link, $database);
-        $r = mysqli_query($link, $query);
-
-        return $r;
+        return \Mysql2i\Shim\MysqlDbQuery::invoke($database, $query, $link);
     }
 
     public static function mysql_drop_db($database, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-        $query = "DROP DATABASE `" . $database . "`";
-        mysqli_query($link, $query);
-
-        if (empty(mysqli_errno($link))) {
-            return true;
-        } else {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlDropDb::invoke($database, $link);
     }
 
-    /**
-     * Normalizes a legacy mysql_* link to mysqli (PHP 8 / mysql2i).
-     *
-     * @param mixed $link
-     * @return mysqli|null
-     */
-    public static function resolveMysqliLink($link = null)
-    {
-        if ($link instanceof mysqli) {
-            return $link;
-        }
-
-        if (self::$currObj instanceof mysqli) {
-            return self::$currObj;
-        }
-
-        return null;
-    }
-
-    /**
-     * Runs a script with multiple statements (mysqli_multi_query).
-     *
-     * @param mixed  $link
-     * @param string $script
-     * @return bool
-     */
     public static function mysql_multi_query_script($link, $script)
     {
-        $mysqli = self::resolveMysqliLink($link);
-        if (!($mysqli instanceof mysqli)) {
-            return false;
-        }
-
-        if (!mysqli_multi_query($mysqli, $script)) {
-            return false;
-        }
-
-        do {
-            if ($result = mysqli_store_result($mysqli)) {
-                mysqli_free_result($result);
-            }
-            if (mysqli_errno($mysqli)) {
-                return false;
-            }
-        } while (mysqli_more_results($mysqli) && mysqli_next_result($mysqli));
-
-        return mysqli_errno($mysqli) === 0;
+        return \Mysql2i\Shim\MysqlMultiQueryScript::invoke($link, $script);
     }
 
     public static function mysql_errno($link = null)
     {
-        $mysqli = self::resolveMysqliLink($link);
-        if ($mysqli instanceof mysqli) {
-            return mysqli_errno($mysqli);
-        }
-
-        return 0;
+        return \Mysql2i\Shim\MysqlErrno::invoke($link);
     }
 
     public static function mysql_error($link = null)
     {
-        $mysqli = self::resolveMysqliLink($link);
-        if ($mysqli instanceof mysqli) {
-            return mysqli_error($mysqli);
-        }
-
-        return '';
+        return \Mysql2i\Shim\MysqlError::invoke($link);
     }
 
     public static function mysql_escape_string($escapestr)
     {
-        // Unsafe and deprecated — use mysql_real_escape_string() or prepared statements.
-        $link = self::$currObj;
-
-        if (!$link) {
-            return addslashes($escapestr);
-        }
-
-        return mysqli_real_escape_string($link, $escapestr);
+        return \Mysql2i\Shim\MysqlEscapeString::invoke($escapestr);
     }
 
     public static function mysql_fetch_array($result, $resulttype = MYSQLI_BOTH)
     {
-        if (!($result instanceof mysqli_result)) {
-            trigger_error('mysql_fetch_array(): supplied resource is not a valid MySQL result resource', E_USER_WARNING);
-            return false;
-        }
-        $row = mysqli_fetch_array($result, $resulttype);
-
-        return $row === null ? false : $row;
+        return \Mysql2i\Shim\MysqlFetchArray::invoke($result, $resulttype);
     }
 
     public static function mysql_fetch_assoc($result)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        $row = mysqli_fetch_assoc($result);
-
-        return $row === null ? false : $row;
+        return \Mysql2i\Shim\MysqlFetchAssoc::invoke($result);
     }
 
     public static function mysql_fetch_field($result, $field_offset = null)
     {
-        if (!empty($field_offset)) {
-            for ($x = 0; $x < $field_offset; $x++) {
-                mysqli_fetch_field($result);
-            }
-        }
-
-        return mysqli_fetch_field($result);
+        return \Mysql2i\Shim\MysqlFetchField::invoke($result, $field_offset);
     }
 
     public static function mysql_fetch_lengths($result)
     {
-        return mysqli_fetch_lengths($result);
+        return \Mysql2i\Shim\MysqlFetchLengths::invoke($result);
     }
 
     public static function mysql_fetch_object($result, $class_name = 'stdClass', $params = [])
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        if (empty($params)) {
-            $row = mysqli_fetch_object($result, $class_name);
-        } else {
-            $row = mysqli_fetch_object($result, $class_name, $params);
-        }
-
-        return $row === null ? false : $row;
+        return \Mysql2i\Shim\MysqlFetchObject::invoke($result, $class_name, $params);
     }
 
     public static function mysql_fetch_row($result)
     {
-        $row = mysqli_fetch_row($result);
-
-        return $row === null ? false : $row;
+        return \Mysql2i\Shim\MysqlFetchRow::invoke($result);
     }
 
-    /*
-    credit to andre at koethur dot de from php.net and NinjaKC from stackoverflow.com
-    */
     public static function mysql_field_flags($result, $field_offset)
     {
-        static $flags;
-
-        $flags_num = mysqli_fetch_field_direct($result, $field_offset)->flags;
-
-        if (!isset($flags)) {
-            $flags = array();
-            $constants = get_defined_constants(true);
-            foreach ($constants['mysqli'] as $c => $n) {
-                if (preg_match('/MYSQLI_(.*)_FLAG$/', $c, $m)) {
-                    if (!array_key_exists($n, $flags)) {
-                        $flags[$n] = $m[1];
-                    }
-                }
-            }
-        }
-
-        $result = array();
-        foreach ($flags as $n => $t) {
-            if ($flags_num & $n) {
-                $result[] = $t;
-            }
-        }
-
-        $return = implode(' ', $result);
-        $return = str_replace('PRI_KEY', 'PRIMARY_KEY', $return);
-        $return = strtolower($return);
-
-        return $return;
+        return \Mysql2i\Shim\MysqlFieldFlags::invoke($result, $field_offset);
     }
 
     public static function mysql_field_len($result, $field_offset)
     {
-        $fieldInfo = mysqli_fetch_field_direct($result, $field_offset);
-
-        return $fieldInfo->length;
+        return \Mysql2i\Shim\MysqlFieldLen::invoke($result, $field_offset);
     }
 
     public static function mysql_field_name($result, $field_offset)
     {
-        $fieldInfo = mysqli_fetch_field_direct($result, $field_offset);
-
-        return $fieldInfo->name;
+        return \Mysql2i\Shim\MysqlFieldName::invoke($result, $field_offset);
     }
 
     public static function mysql_field_seek($result, $fieldnr)
     {
-        return mysqli_field_seek($result, $fieldnr);
+        return \Mysql2i\Shim\MysqlFieldSeek::invoke($result, $fieldnr);
     }
 
     public static function mysql_field_table($result, $field_offset)
     {
-        $fieldInfo = mysqli_fetch_field_direct($result, $field_offset);
-
-        return $fieldInfo->table;
+        return \Mysql2i\Shim\MysqlFieldTable::invoke($result, $field_offset);
     }
 
-    /*
-    credit to andre at koethur dot de from php.net and NinjaKC from stackoverflow.com
-    */
     public static function mysql_field_type($result, $field_offset)
     {
-        static $types;
-
-        $type_id = mysqli_fetch_field_direct($result, $field_offset)->type;
-
-        if (!isset($types)) {
-            $types = array();
-            $constants = get_defined_constants(true);
-            foreach ($constants['mysqli'] as $c => $n) {
-                if (preg_match('/^MYSQLI_TYPE_(.*)/', $c, $m)) {
-                    $types[$n] = $m[1];
-                }
-            }
-        }
-
-        return array_key_exists($type_id, $types) ? $types[$type_id] : null;
+        return \Mysql2i\Shim\MysqlFieldType::invoke($result, $field_offset);
     }
 
     public static function mysql_free_result($result)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return true;
-        }
-
-        mysqli_free_result($result);
-
-        return true;
+        return \Mysql2i\Shim\MysqlFreeResult::invoke($result);
     }
 
     public static function mysql_get_client_info()
     {
-        $link = self::$currObj;
-
-        return mysqli_get_client_info($link);
+        return \Mysql2i\Shim\MysqlGetClientInfo::invoke();
     }
 
     public static function mysql_get_host_info($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_get_host_info($link);
+        return \Mysql2i\Shim\MysqlGetHostInfo::invoke($link);
     }
 
     public static function mysql_get_proto_info($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_get_proto_info($link);
+        return \Mysql2i\Shim\MysqlGetProtoInfo::invoke($link);
     }
 
     public static function mysql_get_server_info($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_get_server_info($link);
+        return \Mysql2i\Shim\MysqlGetServerInfo::invoke($link);
     }
 
     public static function mysql_info($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_info($link);
+        return \Mysql2i\Shim\MysqlInfo::invoke($link);
     }
 
     public static function mysql_insert_id($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_insert_id($link);
+        return \Mysql2i\Shim\MysqlInsertId::invoke($link);
     }
 
     public static function mysql_list_dbs($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli) || $link->connect_errno) {
-            return false;
-        }
-
-        $query = "SHOW DATABASES";
-        $r = mysqli_query($link, $query);
-
-        if (empty(mysqli_errno($link))) {
-            return $r;
-        } else {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlListDbs::invoke($link);
     }
 
     public static function mysql_list_fields($database_name, $table_name, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-        $query = "SHOW COLUMNS FROM `" . $table_name . "`";
-        $r = mysqli_query($link, $query);
-
-        if (empty(mysqli_errno($link))) {
-            return $r;
-        } else {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlListFields::invoke($database_name, $table_name, $link);
     }
 
     public static function mysql_list_processes($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_thread_id($link);
+        return \Mysql2i\Shim\MysqlListProcesses::invoke($link);
     }
 
     public static function mysql_list_tables($database, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-        $query = "SHOW TABLES FROM `" . $database . "`";
-        $r = mysqli_query($link, $query);
-
-        if (empty(mysqli_errno($link))) {
-            return $r;
-        } else {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlListTables::invoke($database, $link);
     }
 
     public static function mysql_num_fields($result)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        return mysqli_num_fields($result);
+        return \Mysql2i\Shim\MysqlNumFields::invoke($result);
     }
 
     public static function mysql_num_rows($result)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        return mysqli_num_rows($result);
+        return \Mysql2i\Shim\MysqlNumRows::invoke($result);
     }
 
     public static function mysql_pconnect($host = '', $username = '', $passwd = '', $new_link = false, $client_flags = 0)
     {
-        $link = mysqli_connect('p:' . $host, $username, $passwd);
-        if (!$link) {
-            $errorMsg = mysqli_connect_error();
-            error_log('MySQL Persistent Connection Error: ' . $errorMsg);
-            echo $errorMsg . '<br>';
-        }
-        self::$currObj = $link;
-
-        return $link;
+        return \Mysql2i\Shim\MysqlPconnect::invoke($host, $username, $passwd, $new_link, $client_flags);
     }
 
     public static function mysql_ping($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli)) {
-            return false;
-        }
-
-        if ($link->connect_errno || !isset($link->host_info)) {
-            return false;
-        }
-
-        $result = @mysqli_query($link, 'SELECT 1');
-
-        if ($result instanceof mysqli_result) {
-            mysqli_free_result($result);
-        }
-
-        return $result !== false;
+        return \Mysql2i\Shim\MysqlPing::invoke($link);
     }
 
     public static function mysql_query($query, $link = null)
     {
-        if (empty($query) || !is_string($query)) {
-            trigger_error('mysql_query(): Query cannot be empty', E_USER_WARNING);
-            return false;
-        }
-
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli) || $link->connect_errno || !isset($link->host_info)) {
-            $errorMsg = $link && ($link instanceof mysqli) ? $link->connect_error : 'No MySQL connection';
-            error_log('MySQL Connection Error: ' . $errorMsg);
-            return false;
-        }
-
-        $r = mysqli_query($link, $query);
-        return $r;
+        return \Mysql2i\Shim\MysqlQuery::invoke($query, $link);
     }
 
     public static function mysql_real_escape_string($escapestr, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        if (!$link || !($link instanceof mysqli) || self::$isClosing) {
-            return addslashes($escapestr); // Fallback when the connection is closed or invalid.
-        }
-
-        return mysqli_real_escape_string($link, $escapestr);
+        return \Mysql2i\Shim\MysqlRealEscapeString::invoke($escapestr, $link);
     }
 
     public static function mysql_result($result, $row, $field = null)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        mysqli_data_seek($result, $row);
-        if (!empty($field)) {
-            mysqli_field_seek($result, 0);
-            while ($finfo = mysqli_fetch_field($result)) {
-                if ($field == $finfo->name) {
-                    $f = mysqli_fetch_assoc($result);
-                    return $f[$field];
-                }
-            }
-        }
-
-        $f = mysqli_fetch_array($result);
-        return $f[0];
+        return \Mysql2i\Shim\MysqlResult::invoke($result, $row, $field);
     }
 
     public static function mysql_select_db($dbname, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        } elseif ($link instanceof mysqli && !$link->connect_errno) {
-            self::$currObj = $link;
-        }
-
-        if (!$link || !($link instanceof mysqli)) {
-            return false;
-        }
-
-        if (empty($dbname)) {
-            return false;
-        }
-
-        try {
-            return mysqli_select_db($link, $dbname);
-        } catch (Exception $e) {
-            return false;
-        }
+        return \Mysql2i\Shim\MysqlSelectDb::invoke($dbname, $link);
     }
 
     public static function mysql_set_charset($charset, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_set_charset($link, $charset);
+        return \Mysql2i\Shim\MysqlSetCharset::invoke($charset, $link);
     }
 
     public static function mysql_stat($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_stat($link);
+        return \Mysql2i\Shim\MysqlStat::invoke($link);
     }
 
     public static function mysql_tablename($result, $row, $field = null)
     {
-        if (!$result || !($result instanceof mysqli_result)) {
-            return false;
-        }
-
-        mysqli_data_seek($result, $row);
-
-        $f = mysqli_fetch_array($result);
-
-        return $f[0];
+        return \Mysql2i\Shim\MysqlTablename::invoke($result, $row, $field);
     }
 
     public static function mysql_thread_id($link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
-
-        return mysqli_thread_id($link);
+        return \Mysql2i\Shim\MysqlThreadId::invoke($link);
     }
 
     public static function mysql_unbuffered_query($query, $link = null)
     {
-        if (empty($link)) {
-            $link = self::$currObj;
-        }
+        return \Mysql2i\Shim\MysqlUnbufferedQuery::invoke($query, $link);
+    }
 
-        $r = mysqli_query($link, $query, MYSQLI_USE_RESULT);
-
-        return $r;
+    public static function resolveMysqliLink($link = null)
+    {
+        return \Mysql2i\ResolveMysqliLink::invoke($link);
     }
 }
 

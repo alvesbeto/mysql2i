@@ -1,3 +1,11 @@
+## 2026-11-03: Namespace `Mysql2i\` (no vendor prefix)
+
+PSR-4 path `src/Mysql2i/`; dropped `Alvesbeto\` segment from namespace (2.0.0 docs).
+
+## 2026-11-03: Split shim into namespaced classes (2.0.0)
+
+One `Mysql2i\Shim\*` class per `mysql_*`; `LinkContext` + `ResolveMysqliLink`; global `mysql2i` facade unchanged. PSR-4 autoload; TECH, API, README, CHANGELOG updated.
+
 ## 2026-11-03: php.net parity audit (docs)
 
 Verified **48/48** functions from [ref.mysql.php](https://www.php.net/manual/en/ref.mysql.php) in `src/`; **49** globals including `mysql_multi_query_script`. Fixed registry intro (**44** → **48 + extension**); README, API, shim-behavior, CHANGELOG 1.0.6.

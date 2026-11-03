@@ -6,7 +6,7 @@ tags: [behavior, mysql-shim]
 
 # Shim behavior contract
 
-Source of truth for code: `src/mysql2i.class.php`, `src/mysql2i.func.php`. This page is the **agent-facing** summary.
+Source of truth for code: `src/mysql2i.class.php` (facade), `src/Mysql2i/Shim/*.php` (one class per `mysql_*` implementation), `src/mysql2i.func.php`. This page is the **agent-facing** summary.
 
 **Per-method catalog** (48 php.net `mysql_*` + extension `mysql_multi_query_script`; line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
 

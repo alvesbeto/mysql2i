@@ -24,7 +24,7 @@ sources:
 
 # mysql shim method registry
 
-**49** global functions in `src/mysql2i.func.php`: all **48** symbols from the [PHP mysql extension reference](https://www.php.net/manual/en/ref.mysql.php), plus **`mysql_multi_query_script`** (Corbee extension). Each delegates to **`mysql2i::mysql_*`** in `src/mysql2i.class.php`. Class-only helpers: `resolveMysqliLink`, `$currObj` / `$isClosing`.
+**49** global functions in `src/mysql2i.func.php`: all **48** symbols from the [PHP mysql extension reference](https://www.php.net/manual/en/ref.mysql.php), plus **`mysql_multi_query_script`** (Corbee extension). Each delegates to **`mysql2i::mysql_*`**, which forwards to **`Mysql2i\Shim\{Class}::invoke()`** (e.g. `MysqlQuery` for `mysql_query`). Class-only helpers: `Mysql2i\ResolveMysqliLink`, `Mysql2i\LinkContext`, global `mysql2i::$currObj`.
 
 Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/shim-behavior.md](../../specs/shim-behavior.md).
 
@@ -34,11 +34,12 @@ Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/s
 
 ## Class helpers (no global function)
 
-| Symbol | Class L | mysqli / behavior |
-|--------|---------|-------------------|
-| `mysql2i::$currObj` | 12 | Implicit link for `empty($link)` call sites |
-| `mysql2i::$isClosing` | 13 | Set during `mysql_close`; affects `mysql_real_escape_string` fallback |
-| `mysql2i::resolveMysqliLink($link)` | 140 | Returns `$link` if `mysqli`, else `$currObj`, else `null`; used by `mysql_errno` / `mysql_error` |
+| Symbol | Location | mysqli / behavior |
+|--------|----------|-------------------|
+| `mysql2i::$currObj` | global facade | Implicit link; backed by `LinkContext` |
+| `LinkContext::$isClosing` (via API) | `Mysql2i\LinkContext` | Set during `mysql_close`; affects `mysql_real_escape_string` fallback |
+| `ResolveMysqliLink::invoke($link)` | `Mysql2i\ResolveMysqliLink` | Returns `$link` if `mysqli`, else current link, else `null`; used by `mysql_errno` / `mysql_error` |
+| `mysql2i::resolveMysqliLink($link)` | facade → `ResolveMysqliLink` | Same as above |
 
 ---
 
