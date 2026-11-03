@@ -20,7 +20,7 @@ Open [index.md](index.md) and follow **one** row. Default skill: [skills/mysql2i
 
 ### ASK FIRST
 
-- Breaking change to function signatures or semantics consumed by Webcred and other apps.
+- Breaking change to function signatures or semantics consumed by downstream applications.
 - New Composer dependency or PHP version bump.
 - CI, Packagist name, or license change.
 - Removing or renaming public `mysql_*` shims.

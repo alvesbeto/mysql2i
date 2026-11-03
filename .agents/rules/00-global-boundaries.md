@@ -26,3 +26,4 @@ scope: "**/*"
 - Out-of-scope drive-by fixes.
 - Ambiguous contract work without SDD approval.
 - Edit `vendor/`.
+- Name proprietary downstream applications or their internal paths in tracked documentation.

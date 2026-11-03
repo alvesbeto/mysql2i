@@ -124,7 +124,7 @@ $link = mysql_connect($host, $user, $pass);
 mysql_query("SET time_zone = '-03:00'"); // uses $link via $currObj
 ```
 
-If your app keeps the link in a variable (for example `$conMy01_0`), pass it explicitly: `mysql_query($sql, $conMy01_0)`.
+If your app keeps the link in a variable (for example `$dbLink`), pass it explicitly: `mysql_query($sql, $dbLink)`.
 
 Calling `mysql_select_db($database, $link)` with an explicit connection also updates `$currObj`, so the next `mysql_query($sql)` without a link uses that same connection.
 
@@ -139,9 +139,9 @@ Calling `mysql_select_db($database, $link)` with an explicit connection also upd
 If you previously shipped copies of `mysql2i.class.php` and `mysql2i.func.php` inside the project (common in legacy codebases):
 
 ```php
-// Before
-require_once __DIR__ . '/classes/config/mysql2i.class.php';
-require_once __DIR__ . '/classes/config/mysql2i.func.php';
+// Before (typical legacy layout)
+require_once __DIR__ . '/includes/mysql2i.class.php';
+require_once __DIR__ . '/includes/mysql2i.func.php';
 
 // After Composer install
 require_once __DIR__ . '/vendor/autoload.php';
@@ -255,4 +255,4 @@ MIT — see [LICENSE](LICENSE).
 
 ## Credits
 
-Implementation evolved from the **mysql2i** adapter used in legacy Beto Souza projects. Source comments credit contributors for parts of `mysql_field_flags` / `mysql_field_type` (php.net / Stack Overflow).
+Implementation evolved from community **mysql2i** adapters for PHP 8 migration. Source comments credit contributors for parts of `mysql_field_flags` / `mysql_field_type` (php.net / Stack Overflow).

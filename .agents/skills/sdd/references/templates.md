@@ -7,7 +7,7 @@
 
 ## Objective
 ## Scope / out of scope
-## Consumer impact (Webcred, semver)
+## Consumer impact (semver, integrating apps)
 ## Success criteria (testable)
 ## Boundaries (always / ask / never)
 ## Open questions

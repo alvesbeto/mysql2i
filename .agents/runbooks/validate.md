@@ -12,4 +12,4 @@ php -r "require 'vendor/autoload.php'; var_dump(function_exists('mysql_connect')
 
 Expect: syntax OK and `bool(true) bool(true)`.
 
-Before release (maintainer): tag, Packagist, consumer smoke in Webcred if integrated.
+Before release (maintainer): tag, Packagist, smoke test in at least one integrating application if available.

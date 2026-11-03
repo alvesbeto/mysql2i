@@ -16,4 +16,6 @@ Proper names (e.g. Beto Souza) may stay untranslated.
 
 ## Consequences
 
-Portuguese prose belongs in consumer apps (e.g. Webcred), not in this package's public surface.
+Portuguese prose belongs in consumer apps, not in this package's public surface.
+
+Do not name proprietary downstream applications, their repositories, or internal directory layouts in README, `docs/`, `CHANGELOG`, or `.agents/` routing text.

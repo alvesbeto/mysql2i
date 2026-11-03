@@ -65,7 +65,7 @@ Link validity for application code: use bootstrap-owned `$link` / `$currObj`, or
 
 ## Out of scope for this package
 
-- PDO shim (separate project / Webcred `mysql2pdo`)
+- PDO-based `mysql_*` compatibility (separate effort; out of scope here)
 - Prepared statements wrapper
 - Connection config from env files
 

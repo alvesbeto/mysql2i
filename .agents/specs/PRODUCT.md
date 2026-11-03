@@ -17,7 +17,7 @@ The installer’s application owns connection settings. This package registers `
 | Consumer | Integration |
 |----------|-------------|
 | Legacy PHP apps | `composer require alvesbeto/mysql2i` + `vendor/autoload.php` |
-| Webcred (optional) | Path repo; replaces local `classes/config/mysql2i.*` requires |
+| Monorepo / path install (optional) | Path repository; replaces copied `mysql2i.*` requires in the app tree |
 
 ## Canonical behavior
 
