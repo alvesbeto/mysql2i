@@ -1,32 +1,54 @@
 # alvesbeto/mysql2i
 
-Composer library that restores the **`mysql_*`** API (removed in PHP 7.0) on **PHP 8+**, backed by **`ext-mysqli`**.
+**Legacy `mysql_*` functions for PHP 8+, implemented on `ext-mysqli`.**
 
-It targets legacy applications that still call `mysql_connect`, `mysql_query`, `mysql_fetch_assoc`, and similar functions, so you can migrate to PHP 8 without rewriting all data-access code at once.
+PHP removed the old `mysql` extension in 7.0. Many applications still call `mysql_connect`, `mysql_query`, `mysql_fetch_assoc`, and the rest. This Composer library registers those global functions again and delegates to **mysqli** under the hood, so you can run on PHP 8 without rewriting every query at once.
+
+- **Repository:** [github.com/alvesbeto/mysql2i](https://github.com/alvesbeto/mysql2i)
+- **API reference:** [docs/API.md](docs/API.md)
+
+This is a **compatibility shim**, not a reimplementation of the C extension.
+
+---
 
 ## Requirements
 
-| Requirement | Version |
-|-------------|---------|
-| PHP | `^8.0` (tested on 8.x) |
-| Extension | `mysqli` (`ext-mysqli`) |
-| MySQL / MariaDB | Whatever your `mysqli` driver supports |
+| Requirement | Notes |
+|-------------|--------|
+| PHP | `^8.0` (see `composer.json`) |
+| Extension | `mysqli` (`ext-mysqli`, required) |
+| Database server | Any MySQL or MariaDB version your `mysqli` driver supports |
 
-The native PHP **`mysql`** extension no longer exists; this package is a **shim**, not a C extension reimplementation.
+You must install and enable `ext-mysqli` in `php.ini`. This package does not ship a database server or Docker setup.
+
+---
 
 ## Installation
 
-### Via Composer (Packagist or VCS)
-
-Once the package is published:
+### From Packagist (recommended)
 
 ```bash
 composer require alvesbeto/mysql2i
 ```
 
-### Via path (monorepo or local development)
+After the package is submitted to [Packagist](https://packagist.org/packages/alvesbeto/mysql2i), that is the normal way to install it. Prefer a tagged release when available, for example:
 
-In the consuming project's `composer.json`:
+```bash
+composer require alvesbeto/mysql2i:^1.0
+```
+
+**Not on Packagist yet?** Point Composer at the GitHub repository, then require `dev-main`:
+
+```bash
+composer config repositories.mysql2i vcs https://github.com/alvesbeto/mysql2i
+composer require alvesbeto/mysql2i:dev-main
+```
+
+### From a local clone (path repository)
+
+Use this when the package lives next to your app in a monorepo or you are hacking on mysql2i itself.
+
+Add to the **consumer** project's `composer.json`:
 
 ```json
 {
@@ -45,30 +67,34 @@ In the consuming project's `composer.json`:
 }
 ```
 
-Then:
+Then run:
 
 ```bash
 composer update alvesbeto/mysql2i
 ```
 
-### Without Composer (not recommended)
+Adjust `url` to the relative or absolute path of this repository.
+
+### Without Composer (discouraged)
+
+Load the two source files **in this order**:
 
 ```php
 require_once '/path/to/mysql2i/src/mysql2i.class.php';
 require_once '/path/to/mysql2i/src/mysql2i.func.php';
 ```
 
-Order matters: **class file before the functions file**.
+---
 
 ## Quick start
 
-1. Load Composer autoload in your application bootstrap (before any `mysql_*` call):
+1. Load autoload **before** any `mysql_*` call (typically in your bootstrap):
 
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
 ```
 
-2. Connect and use the legacy API as before:
+2. Use the API like PHP 5 did. Connection and result handles are **`mysqli`** and **`mysqli_result` objects**, not `resource` types:
 
 ```php
 $link = mysql_connect('127.0.0.1', 'user', 'password');
@@ -77,7 +103,6 @@ if (!$link) {
 }
 
 mysql_select_db('my_database', $link);
-mysql_set_charset('utf8mb4', $link);
 
 $result = mysql_query('SELECT id, name FROM customers LIMIT 10', $link);
 while ($row = mysql_fetch_assoc($result)) {
@@ -86,108 +111,112 @@ while ($row = mysql_fetch_assoc($result)) {
 mysql_free_result($result);
 ```
 
-### Global connection (`$currObj`)
+Successful `mysql_connect` / `mysql_pconnect` already set the connection charset to **`utf8mb4`**. You only need `mysql_set_charset()` if you want something else.
 
-The `mysql2i` class keeps the “current” connection in `mysql2i::$currObj`. Functions that omit the `$link` argument use that reference—the same behavior as classic `mysql_*` after `mysql_connect`.
+### Default connection (`mysql2i::$currObj`)
+
+After `mysql_connect`, many functions accept an optional `$link`. If you omit it, they use the last connection stored in `mysql2i::$currObj` (same idea as classic `mysql_*`):
 
 ```php
 $link = mysql_connect($host, $user, $pass);
-// mysql_query($sql) uses $link implicitly
-mysql_query("SET time_zone = '-03:00'");
+mysql_query("SET time_zone = '-03:00'"); // uses $link via $currObj
 ```
 
-If your code stores the link in a variable (e.g. `$conMy01_0`), pass it explicitly: `mysql_query($sql, $conMy01_0)`.
+If your app keeps the link in a variable (for example `$conMy01_0`), pass it explicitly: `mysql_query($sql, $conMy01_0)`.
 
-## Legacy project integration (e.g. Webcred)
+---
 
-Replace local requires:
+## Migrating from copied shim files
+
+If you previously shipped copies of `mysql2i.class.php` and `mysql2i.func.php` inside the project (common in legacy codebases):
 
 ```php
 // Before
 require_once __DIR__ . '/classes/config/mysql2i.class.php';
 require_once __DIR__ . '/classes/config/mysql2i.func.php';
 
-// After (composer install)
+// After Composer install
 require_once __DIR__ . '/vendor/autoload.php';
-// mysql_* available via autoload "files" + classmap
 ```
 
-Keep **mysqli only inside this package**; business code should keep calling `mysql_*` only.
+Remove the old copies once autoload is in place to avoid loading the shim twice.
 
-## Composer autoload
+**Encapsulation:** only this package should call `mysqli_*` directly. Application code should keep using `mysql_*`.
 
-| Mechanism | File | Role |
-|-----------|------|------|
-| `classmap` | `src/mysql2i.class.php` | Static `mysql2i` class |
+---
+
+## How Composer autoload works
+
+| Mechanism | File | What it loads |
+|-----------|------|----------------|
+| `classmap` | `src/mysql2i.class.php` | Class `mysql2i` |
 | `files` | `src/mysql2i.func.php` | Global `mysql_*` functions and `MYSQL_*` constants |
 
-Guards prevent redefinition if the shim is loaded twice:
+If the shim is included twice in one request, guards skip redefinition:
 
-- `class_exists('mysql2i', false)` on the class
-- `function_exists('mysql_affected_rows')` on the functions
+- Class: `class_exists('mysql2i', false)`
+- Functions: `function_exists('mysql_affected_rows')` (first function in the block)
 
-## Extended API (beyond classic mysql_*)
+---
 
-Useful on PHP 8 and for batch scripts:
+## Extensions beyond classic `mysql_*`
 
-| Function | Description |
-|----------|-------------|
-| `mysql_multi_query_script($link, $script)` | Runs multiple statements via `mysqli_multi_query`, draining results |
-| `mysql_is_valid_link($link = null)` | Checks whether the link is a valid `mysqli` or legacy resource |
-| `mysql2i::resolveMysqliLink($link)` | Normalizes a link to `mysqli` (internal / advanced) |
+| Symbol | Purpose |
+|--------|---------|
+| `mysql_multi_query_script($link, $script)` | Run a multi-statement SQL script via `mysqli_multi_query`, draining result sets |
+| `mysql_is_valid_link($link = null)` | Whether the link is a connected `mysqli` (or legacy `resource`) |
+| `mysql2i::resolveMysqliLink($link)` | Normalize a link to `mysqli` (advanced / internal) |
 
-Full list and details: [docs/API.md](docs/API.md).
+See [docs/API.md](docs/API.md) for the full function list and return types.
 
-## Important behavior
+---
 
-### Charset
+## Behavior to know before production
 
-`mysql_connect` and `mysql_pconnect` set **`utf8mb4`** on the connection when it succeeds. The procedural `mysql_connect` wrapper also calls `set_charset('utf8mb4')` after connecting.
+### Connection handles and `is_resource()`
 
-### `mysql_close`
+On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `mysql_is_valid_link($link)` or `$link instanceof mysqli`.
 
-For compatibility with long-running scripts and shutdown handlers, **`mysql_close` does not actually close the socket** in the current implementation: it returns `true` and avoids aggressive teardown. The connection ends when the PHP request finishes.
+### `mysql_close()`
 
-### Runtime deprecations
+For long-running scripts and shutdown handlers, **`mysql_close()` does not tear down the socket**. It usually returns `true` without aggressively closing. The connection ends when the PHP request finishes. Do not rely on it to free the connection mid-request.
 
-- `mysql_escape_string()` — triggers `E_USER_DEPRECATED`; prefer `mysql_real_escape_string()` or prepared statements.
-- `mysql_pconnect()` — triggers `E_USER_DEPRECATED`.
+### Deprecated helpers
+
+| Function | What happens |
+|----------|----------------|
+| `mysql_escape_string()` | Emits `E_USER_DEPRECATED`; use `mysql_real_escape_string()` or prepared statements |
+| `mysql_pconnect()` | Emits `E_USER_DEPRECATED`; still connects with a `p:` host prefix when used |
 
 ### Security
 
-This package **does not** replace prepared statements. `mysql_real_escape_string` delegates to `mysqli_real_escape_string`; with an invalid connection it falls back to `addslashes` (inherited adapter behavior).
+This shim **does not add prepared statements**. `mysql_real_escape_string()` uses `mysqli_real_escape_string()` when the link is valid; otherwise it falls back to `addslashes()` (legacy adapter behavior).
 
-For new code, use **PDO**, **mysqli prepared statements**, or an ORM—do not expand SQL string concatenation.
+For new code, prefer **PDO**, **mysqli prepared statements**, or an ORM. Do not grow new SQL built from string concatenation.
 
-### Links and types
+### Constants
 
-On PHP 8, links and results are **`mysqli`** and **`mysqli_result`** instances, not `resource`. Code that uses `is_resource($link)` should use `mysql_is_valid_link()` or `$link instanceof mysqli`.
+If not already defined, the shim defines `MYSQL_BOTH`, `MYSQL_NUM`, `MYSQL_ASSOC`, and the `MYSQL_CLIENT_*` flags, mapped from the matching `MYSQLI_*` values.
 
-## Defined constants
+---
 
-If not already defined, the shim defines:
+## Developing this package
 
-`MYSQL_BOTH`, `MYSQL_NUM`, `MYSQL_ASSOC`, `MYSQL_CLIENT_COMPRESS`, `MYSQL_CLIENT_SSL`, `MYSQL_CLIENT_INTERACTIVE`, `MYSQL_CLIENT_IGNORE_SPACE` — mapped to the corresponding `MYSQLI_*` values.
-
-## Package development
+From the repository root:
 
 ```bash
-cd /path/to/mysql2i
 composer validate --strict
 composer dump-autoload -o
 php -l src/mysql2i.class.php
 php -l src/mysql2i.func.php
-```
-
-Minimal manual smoke test:
-
-```bash
 php -r "require 'vendor/autoload.php'; var_dump(function_exists('mysql_connect'), class_exists('mysql2i'));"
 ```
 
-### Agent / SDD context
+Expected output: `bool(true) bool(true)`.
 
-Maintainers and coding agents: start at [AGENTS.md](AGENTS.md) (map in [.agents/index.md](.agents/index.md)). Shim invariants for agents: [.agents/specs/shim-behavior.md](.agents/specs/shim-behavior.md).
+**Maintainers and coding agents:** start at [AGENTS.md](AGENTS.md) (index: [.agents/index.md](.agents/index.md)). Shim contract: [.agents/specs/shim-behavior.md](.agents/specs/shim-behavior.md).
+
+---
 
 ## License
 
@@ -195,4 +224,4 @@ MIT — see [LICENSE](LICENSE).
 
 ## Credits
 
-Implementation derived from the **mysql2i** adapter used in legacy Beto Souza projects. Partial credits for `mysql_field_flags` / `mysql_field_type` are noted in source comments (php.net / stackoverflow).
+Implementation evolved from the **mysql2i** adapter used in legacy Beto Souza projects. Source comments credit contributors for parts of `mysql_field_flags` / `mysql_field_type` (php.net / Stack Overflow).

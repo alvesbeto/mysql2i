@@ -1,8 +1,13 @@
 {
     "name": "alvesbeto/mysql2i",
-    "description": "Shim for the mysql_* API removed in PHP 7+, implemented on ext-mysqli for PHP 8+",
+    "description": "Legacy mysql_* functions for PHP 8+, implemented on ext-mysqli (compatibility shim)",
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/alvesbeto/mysql2i",
+    "support": {
+        "issues": "https://github.com/alvesbeto/mysql2i/issues",
+        "source": "https://github.com/alvesbeto/mysql2i"
+    },
     "keywords": [
         "mysql",
         "mysqli",
