@@ -50,6 +50,8 @@ Does not aggressively close the socket; returns `true` for compatibility with sh
 | API | Purpose |
 |-----|---------|
 | `mysql_multi_query_script($link, $script)` | Multi-statement scripts via `mysqli_multi_query` |
+| `mysql_is_result($result)` | `mysqli_result` or legacy `resource` (replace `is_resource` on query results) |
+| `mysql_free_result_if_needed($result)` | Calls `mysql_free_result` only when `mysql_is_result` is true |
 | `mysql2i::resolveMysqliLink` | Normalize link for error helpers |
 
 ## Deprecations (func layer)

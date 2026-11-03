@@ -83,6 +83,16 @@ Selects `$database` and runs `$query`.
 | `mysql_free_result($result)` | safe no-op when result is invalid |
 | `mysql_result($result, $row, $field = null)` | fetch by row index or column name |
 
+## Result helpers (PHP 8 migration)
+
+### `mysql_is_result($result): bool`
+
+Returns true when `$result` is a `mysqli_result` from `mysql_query` / related APIs, or a legacy `resource`. Use instead of `is_resource($result)` on PHP 8+.
+
+### `mysql_free_result_if_needed($result): void`
+
+Calls `mysql_free_result($result)` only when `mysql_is_result($result)` is true; otherwise no-op.
+
 ---
 
 ## Field metadata
@@ -161,6 +171,8 @@ Helper methods:
 - **`mysql2i::resolveMysqliLink($link = null): ?mysqli`**
 - **`mysql2i::mysql_multi_query_script($link, $script): bool`**
 - **`mysql2i::mysql_is_valid_link($link = null): bool`**
+- **`mysql2i::mysql_is_result($result): bool`**
+- **`mysql2i::mysql_free_result_if_needed($result): void`**
 
 Direct class usage (no global function):
 

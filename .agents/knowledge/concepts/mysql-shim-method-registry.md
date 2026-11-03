@@ -22,7 +22,7 @@ sources:
 
 # mysql shim method registry
 
-**47** global `mysql_*` functions in `src/mysql2i.func.php` delegate to **`mysql2i::mysql_*`** in `src/mysql2i.class.php`. Two class-only helpers: `resolveMysqliLink`, `$currObj` / `$isClosing`.
+**47** global `mysql_*` functions in `src/mysql2i.func.php` delegate to **`mysql2i::mysql_*`** in `src/mysql2i.class.php`, plus **2** result helpers (`mysql_is_result`, `mysql_free_result_if_needed`). Two class-only helpers: `resolveMysqliLink`, `$currObj` / `$isClosing`.
 
 Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/shim-behavior.md](../../specs/shim-behavior.md).
 
@@ -78,6 +78,8 @@ Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/s
 | `mysql_num_fields` | 484 | 273 | `mysqli_num_fields` | warn |
 | `mysql_data_seek` | 90 | 75 | `mysqli_data_seek` | warn |
 | `mysql_free_result` | 362 | 205 | Invalid result → `true` (no-op) | guard |
+| `mysql_is_result` | 682 | 372 | `mysqli_result` or legacy `resource` | — |
+| `mysql_free_result_if_needed` | 694 | 377 | void; frees only when `mysql_is_result` | — |
 | `mysql_result` | 577 | 329 | Seek row; optional column name scan; else first column | warn |
 
 ---

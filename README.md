@@ -181,7 +181,7 @@ See [docs/API.md](docs/API.md) for the full function list and return types.
 
 ### Connection handles and `is_resource()`
 
-On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `mysql_is_valid_link($link)` or `$link instanceof mysqli`.
+On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `mysql_is_valid_link($link)` or `$link instanceof mysqli`. For result sets, use **`mysql_is_result($result)`** instead of `is_resource($result)`, and **`mysql_free_result_if_needed($result)`** in cleanup paths that may already be freed.
 
 ### `mysql_close()`
 

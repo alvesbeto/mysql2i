@@ -368,4 +368,14 @@ if (!function_exists('mysql_affected_rows')) {
     {
         return mysql2i::mysql_is_valid_link($link);
     }
+
+    function mysql_is_result($result): bool
+    {
+        return mysql2i::mysql_is_result($result);
+    }
+
+    function mysql_free_result_if_needed($result): void
+    {
+        mysql2i::mysql_free_result_if_needed($result);
+    }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.3] - 2026-11-03
+
+### Added
+
+- `mysql_is_result()` and `mysql_free_result_if_needed()` — common PHP 8 migration helpers (no longer need app-local copies).
+
 ## [1.0.2] - 2026-11-03
 
 ### Changed

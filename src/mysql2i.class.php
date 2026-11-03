@@ -675,6 +675,28 @@ class mysql2i
 
         return is_resource($link);
     }
+
+    /**
+     * Whether $result is a legacy mysql result (mysqli_result on PHP 8+).
+     */
+    public static function mysql_is_result($result): bool
+    {
+        if ($result instanceof mysqli_result) {
+            return true;
+        }
+
+        return is_resource($result);
+    }
+
+    /**
+     * Frees the result when mysql_is_result($result) is true; no-op otherwise.
+     */
+    public static function mysql_free_result_if_needed($result): void
+    {
+        if (self::mysql_is_result($result)) {
+            self::mysql_free_result($result);
+        }
+    }
 }
 
 }
