@@ -8,7 +8,10 @@ generated:
 verified:
   - at: 2026-11-03T18:15:00-03:00
     by: process:agent
-    note: Removed mysql_is_valid_link; line anchors refreshed from src/.
+    note: Removed mysql_is_result / mysql_free_result_if_needed; line anchors from src/.
+  - at: 2026-11-03T18:50:00-03:00
+    by: process:agent
+    note: Parity vs php.net ref.mysql.php — 48 official mysql_* + mysql_multi_query_script (49 globals); line anchors unchanged.
 tags: [mysql-shim, api, behavior]
 sources:
   - id: api-human
@@ -21,7 +24,7 @@ sources:
 
 # mysql shim method registry
 
-**46** global `mysql_*` functions in `src/mysql2i.func.php` delegate to **`mysql2i::mysql_*`** in `src/mysql2i.class.php`, plus **2** result helpers (`mysql_is_result`, `mysql_free_result_if_needed`). Two class-only helpers: `resolveMysqliLink`, `$currObj` / `$isClosing`.
+**49** global functions in `src/mysql2i.func.php`: all **48** symbols from the [PHP mysql extension reference](https://www.php.net/manual/en/ref.mysql.php), plus **`mysql_multi_query_script`** (Corbee extension). Each delegates to **`mysql2i::mysql_*`** in `src/mysql2i.class.php`. Class-only helpers: `resolveMysqliLink`, `$currObj` / `$isClosing`.
 
 Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/shim-behavior.md](../../specs/shim-behavior.md).
 
@@ -76,8 +79,6 @@ Human-long signatures: [docs/API.md](../../../docs/API.md). Invariants: [specs/s
 | `mysql_num_fields` | 480 | 267 | `mysqli_num_fields` | warn |
 | `mysql_data_seek` | 86 | 69 | `mysqli_data_seek` | warn |
 | `mysql_free_result` | 358 | 199 | Invalid result → `true` (no-op) | guard |
-| `mysql_is_result` | 666 | 367 | `mysqli_result` or legacy `resource` | — |
-| `mysql_free_result_if_needed` | 678 | 372 | void; frees only when `mysql_is_result` | — |
 | `mysql_result` | 568 | 323 | Seek row; optional column name scan; else first column | warn |
 
 ---

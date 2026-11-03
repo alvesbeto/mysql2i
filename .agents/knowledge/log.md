@@ -1,6 +1,14 @@
+## 2026-11-03: php.net parity audit (docs)
+
+Verified **48/48** functions from [ref.mysql.php](https://www.php.net/manual/en/ref.mysql.php) in `src/`; **49** globals including `mysql_multi_query_script`. Fixed registry intro (**44** → **48 + extension**); README, API, shim-behavior, CHANGELOG 1.0.6.
+
+## 2026-11-03: Remove `mysql_is_result` / `mysql_free_result_if_needed`
+
+Dropped from `src/` (not historical `mysql_*`). Global count remains **48** php.net + **`mysql_multi_query_script`**; CHANGELOG 1.0.5.
+
 ## 2026-11-03: Remove `mysql_is_valid_link`
 
-Dropped from `src/` (not historical `mysql_*`). Specs, registry (46 funcs), README, API, CHANGELOG 1.0.4 updated. Link checks: consumer bootstrap / `$link instanceof mysqli`.
+Dropped from `src/` (not historical `mysql_*`). Specs, registry, README, API, CHANGELOG 1.0.4 updated. Link checks: consumer bootstrap / `$link instanceof mysqli`.
 
 ## 2026-11-03: Remove Graphify from repo
 

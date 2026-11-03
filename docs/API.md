@@ -2,6 +2,8 @@
 
 All functions below are registered in the global scope after autoload (or after `require` of `mysql2i.func.php`). Implementation delegates to static methods on **`mysql2i`** in `src/mysql2i.class.php`.
 
+**Coverage:** every function listed in the [PHP mysql extension manual](https://www.php.net/manual/en/ref.mysql.php) (**48** symbols) is implemented, plus **`mysql_multi_query_script`** (multi-statement scripts; not part of the original extension).
+
 Signatures follow the historical PHP `mysql_*` documentation unless noted otherwise.
 
 ---
@@ -78,16 +80,6 @@ Selects `$database` and runs `$query`.
 | `mysql_data_seek($result, $offset)` | |
 | `mysql_free_result($result)` | safe no-op when result is invalid |
 | `mysql_result($result, $row, $field = null)` | fetch by row index or column name |
-
-## Result helpers (PHP 8 migration)
-
-### `mysql_is_result($result): bool`
-
-Returns true when `$result` is a `mysqli_result` from `mysql_query` / related APIs, or a legacy `resource`. Use instead of `is_resource($result)` on PHP 8+.
-
-### `mysql_free_result_if_needed($result): void`
-
-Calls `mysql_free_result($result)` only when `mysql_is_result($result)` is true; otherwise no-op.
 
 ---
 
@@ -166,8 +158,6 @@ Helper methods:
 
 - **`mysql2i::resolveMysqliLink($link = null): ?mysqli`**
 - **`mysql2i::mysql_multi_query_script($link, $script): bool`**
-- **`mysql2i::mysql_is_result($result): bool`**
-- **`mysql2i::mysql_free_result_if_needed($result): void`**
 
 Direct class usage (no global function):
 

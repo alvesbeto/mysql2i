@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.6] - 2026-11-03
+
+### Documentation
+
+- Document full parity with the [PHP mysql extension reference](https://www.php.net/manual/en/ref.mysql.php) (**48** functions) plus `mysql_multi_query_script`; corrected agent registry counts (previously **44**).
+
+## [1.0.5] - 2026-11-03
+
+### Removed
+
+- `mysql_is_result()` and `mysql_free_result_if_needed()` — not part of the historical `mysql_*` API; use truthy checks and `mysql_free_result()` (no-op on invalid results in this shim).
+
 ## [1.0.4] - 2026-11-03
 
 ### Removed

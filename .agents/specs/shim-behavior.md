@@ -8,7 +8,7 @@ tags: [behavior, mysql-shim]
 
 Source of truth for code: `src/mysql2i.class.php`, `src/mysql2i.func.php`. This page is the **agent-facing** summary.
 
-**Per-method catalog** (all 46 functions, line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
+**Per-method catalog** (48 php.net `mysql_*` + extension `mysql_multi_query_script`; line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
 
 ## Connection
 
@@ -51,8 +51,6 @@ Link validity for application code: use bootstrap-owned `$link` / `$currObj`, or
 | API | Purpose |
 |-----|---------|
 | `mysql_multi_query_script($link, $script)` | Multi-statement scripts via `mysqli_multi_query` |
-| `mysql_is_result($result)` | `mysqli_result` or legacy `resource` (replace `is_resource` on query results) |
-| `mysql_free_result_if_needed($result)` | Calls `mysql_free_result` only when `mysql_is_result` is true |
 | `mysql2i::resolveMysqliLink` | Normalize link for error helpers |
 
 ## Deprecations (func layer)

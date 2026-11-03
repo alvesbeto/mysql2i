@@ -4,6 +4,8 @@
 
 PHP removed the old `mysql` extension in 7.0. Many applications still call `mysql_connect`, `mysql_query`, `mysql_fetch_assoc`, and the rest. This Composer library registers those global functions again and delegates to **mysqli** under the hood, so you can run on PHP 8 without rewriting every query at once.
 
+The shim implements all **48** functions from the [official PHP mysql reference](https://www.php.net/manual/en/ref.mysql.php), plus **`mysql_multi_query_script`** for batched SQL.
+
 - **Repository:** [github.com/alvesbeto/mysql2i](https://github.com/alvesbeto/mysql2i)
 - **API reference:** [docs/API.md](docs/API.md)
 
@@ -180,7 +182,7 @@ See [docs/API.md](docs/API.md) for the full function list and return types.
 
 ### Connection handles and `is_resource()`
 
-On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `$link instanceof mysqli` (and your app’s connection bootstrap). For result sets, use **`mysql_is_result($result)`** instead of `is_resource($result)`, and **`mysql_free_result_if_needed($result)`** in cleanup paths that may already be freed.
+On PHP 8, `$link` and query results are objects. Replace `is_resource($link)` with `$link instanceof mysqli` (and your app’s connection bootstrap). Before freeing, guard with a truthy `$result`; **`mysql_free_result($result)`** is a safe no-op when the result is invalid (same pattern as classic apps that skipped `is_resource` checks).
 
 ### `mysql_close()`
 
