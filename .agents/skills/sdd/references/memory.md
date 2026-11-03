@@ -4,9 +4,12 @@
 |---------------|----------|--------------|
 | Any line changed | Git (maintainer) | — |
 | Notable delivery | [../../knowledge/log.md](../../knowledge/log.md) | Secrets, full diffs |
-| Current behavior | [../../specs/shim-behavior.md](../../specs/shim-behavior.md) or [../../specs/TECH.md](../../specs/TECH.md) | PRD drafts |
+| Current behavior / invariants | [../../specs/shim-behavior.md](../../specs/shim-behavior.md) | PRD drafts |
+| Per-method lines and guards | [../../knowledge/concepts/mysql-shim-method-registry.md](../../knowledge/concepts/mysql-shim-method-registry.md) | Duplicating full API in specs |
+| Stack / layout | [../../specs/TECH.md](../../specs/TECH.md) | — |
 | Repeatable decision | [../../adrs/](../../adrs/index.md) | Trial-and-error narrative |
 | Non-obvious cross-link | [../../knowledge/concepts/](../../knowledge/index.md) | API duplicates |
+| In-flight feature | [../../sdd/](../../sdd/index.md) | Leave in SDD after ship |
 
 Log entry format: `## YYYY-MM-DD: summary` at top of `log.md`.
 

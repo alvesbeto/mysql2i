@@ -111,7 +111,7 @@ while ($row = mysql_fetch_assoc($result)) {
 mysql_free_result($result);
 ```
 
-Successful `mysql_connect` / `mysql_pconnect` already set the connection charset to **`utf8mb4`**. You only need `mysql_set_charset()` if you want something else.
+Successful `mysql_connect` / `mysql_pconnect` do **not** change charset. Use `mysql_set_charset($charset, $link)` or `mysql_query('SET NAMES …', $link)` like you would on PHP 5.
 
 ### Default connection (`mysql2i::$currObj`)
 
@@ -125,6 +125,10 @@ mysql_query("SET time_zone = '-03:00'"); // uses $link via $currObj
 If your app keeps the link in a variable (for example `$conMy01_0`), pass it explicitly: `mysql_query($sql, $conMy01_0)`.
 
 Calling `mysql_select_db($database, $link)` with an explicit connection also updates `$currObj`, so the next `mysql_query($sql)` without a link uses that same connection.
+
+**`mysql_connect` vs `mysql_pconnect`:** `mysql_connect` reuses a valid `$currObj` instead of opening again. `mysql_pconnect` always opens a new `p:` connection and always sets `$currObj` (see [docs/API.md](docs/API.md)).
+
+**`mysql_query` warnings:** the global function emits an extra PHP warning when there is no connection; `mysql2i::mysql_query()` logs only. **`mysql_unbuffered_query`** does not perform those connection checks—use it only when the link is known good.
 
 ---
 
@@ -188,7 +192,14 @@ For long-running scripts and shutdown handlers, **`mysql_close()` does not tear 
 | Function | What happens |
 |----------|----------------|
 | `mysql_escape_string()` | Emits `E_USER_DEPRECATED`; use `mysql_real_escape_string()` or prepared statements |
-| `mysql_pconnect()` | Emits `E_USER_DEPRECATED`; still connects with a `p:` host prefix when used |
+| `mysql_pconnect()` | Emits `E_USER_DEPRECATED`; always new `p:` connect (does not reuse `$currObj` like `mysql_connect`); may echo connect errors |
+
+### Query helpers
+
+| Topic | Detail |
+|-------|--------|
+| `mysql_query()` | Global: `error_log` + `trigger_error` if no connection; class method: log only, stricter `host_info` check |
+| `mysql_unbuffered_query()` | No empty-query or connection guards in the shim—unlike `mysql_query()` |
 
 ### Security
 

@@ -15,8 +15,9 @@ Map: [../../index.md](../../index.md).
 ## Before coding
 
 1. [specs/shim-behavior.md](../../specs/shim-behavior.md) if touching `src/`.
-2. [rules/php.md](../../rules/php.md) for PHP rules.
-3. Grep for an existing method before adding a shim.
+2. [knowledge/concepts/mysql-shim-method-registry.md](../../knowledge/concepts/mysql-shim-method-registry.md) if touching a public `mysql_*` symbol.
+3. [rules/php.md](../../rules/php.md) for PHP rules.
+4. Grep for an existing method before adding a shim.
 
 ## Shim rules
 
@@ -33,7 +34,7 @@ Task Progress:
 - [ ] 3. If ambiguous or breaking → sdd skill first; stop after PRD approval
 - [ ] 4. Surgical edit in src/
 - [ ] 5. runbooks/validate.md
-- [ ] 6. Update spec/docs if behavior changed; no git write
+- [ ] 6. Update spec/docs/registry if behavior changed; note in knowledge/log if notable; no git write
 ```
 
 ## When to escalate to SDD

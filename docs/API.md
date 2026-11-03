@@ -10,13 +10,15 @@ Signatures follow the historical PHP `mysql_*` documentation unless noted otherw
 
 ### `mysql_connect($host = '', $username = '', $passwd = '', $new_link = false, $client_flags = 0)`
 
-Opens a connection via `mysqli_connect`. Reuses `mysql2i::$currObj` when a valid connection already exists. Sets charset `utf8mb4` on the connection.
+Opens a connection via `mysqli_connect`. Reuses `mysql2i::$currObj` when a valid connection already exists. Does **not** set charset; use `mysql_set_charset()` or your app’s SQL if needed.
 
 **Returns:** `mysqli|false`
 
 ### `mysql_pconnect(...)`
 
-Persistent connection (`p:` host prefix). Emits `E_USER_DEPRECATED`. Sets `utf8mb4` when the connection succeeds.
+Persistent connection (`p:` host prefix). Emits `E_USER_DEPRECATED`. Does **not** set charset automatically.
+
+Unlike `mysql_connect`, **`mysql_pconnect` does not reuse an existing valid `$currObj`** — it always opens a new persistent connection and assigns `$currObj` (even when connect fails). The class implementation ignores `$new_link` and `$client_flags`. On connect failure the class may **`echo`** the error message in addition to logging.
 
 ### `mysql_select_db($dbname, $link = null)`
 
@@ -38,13 +40,22 @@ Returns `true` if `$link` (or `$currObj`) is a connected `mysqli` or a legacy `r
 
 ## Queries
 
+### Global `mysql_query()` vs `mysql2i::mysql_query()`
+
+Both validate empty queries (`E_USER_WARNING`). When the connection is missing or invalid:
+
+- **`mysql_query()`** (global): writes to `error_log` and emits **`trigger_error('mysql_query(): No MySQL connection')`**, then returns `false` without calling the class when the link check fails in the func layer.
+- **`mysql2i::mysql_query()`**: writes to `error_log` only (no `trigger_error`); also requires `isset($link->host_info)` on the `mysqli` instance.
+
+The global function resolves `$link === null` to `mysql2i::$currObj`, validates, then calls the class with that link.
+
 ### `mysql_query($query, $link = null)`
 
-Executes SQL. Emits a warning when the query is empty or there is no connection. Logs connection errors to `error_log`.
+Executes SQL via `mysqli_query`. See **Global vs class** above for warning differences.
 
 ### `mysql_unbuffered_query($query, $link = null)`
 
-`mysqli_query` with `MYSQLI_USE_RESULT`.
+`mysqli_query` with `MYSQLI_USE_RESULT`. The global function is a thin delegate. The class uses `$currObj` when `$link` is empty but performs **no** empty-query or connection checks (unlike `mysql_query`). Invalid links behave like raw mysqli.
 
 ### `mysql_db_query($database, $query, $link = null)`
 
@@ -142,6 +153,8 @@ Public property:
 - **`mysql2i::$currObj`** — current `mysqli` connection
 
 Static methods mirror `mysql_*` functions (same names with an `mysql_` prefix on the method, e.g. `mysql2i::mysql_query`).
+
+**Note:** Calling the class directly skips procedural-layer extras (for example the extra `trigger_error` on failed `mysql_query()`). Prefer globals for legacy apps that expect PHP 5 warning behavior.
 
 Helper methods:
 

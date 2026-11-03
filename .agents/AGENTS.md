@@ -15,6 +15,7 @@ Open [index.md](index.md) and follow **one** row. Default skill: [skills/mysql2i
 - Follow [rules/php.md](rules/php.md) and [specs/shim-behavior.md](specs/shim-behavior.md) when touching the shim.
 - Run [runbooks/validate.md](runbooks/validate.md) before finishing.
 - Update [specs/shim-behavior.md](specs/shim-behavior.md) or [specs/TECH.md](specs/TECH.md) in the same delivery when behavior or public contract changes (maintainer commits).
+- When changing a public `mysql_*` symbol, update [knowledge/concepts/mysql-shim-method-registry.md](knowledge/concepts/mysql-shim-method-registry.md) in the same delivery.
 - Promote structural decisions to [adrs/](adrs/index.md) per [skills/sdd/references/memory.md](skills/sdd/references/memory.md).
 
 ### ASK FIRST

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.2] - 2026-11-03
+
+### Changed
+
+- **Breaking for apps that relied on it:** removed automatic `utf8mb4` on `mysql_connect` / `mysql_pconnect`. The shim only delegates to `mysqli_connect`; charset is the consumer’s responsibility (`mysql_set_charset`, `SET NAMES`, etc.), matching the original `mysql_*` contract.
+
 ## [1.0.1] - 2026-11-03
 
 ### Fixed

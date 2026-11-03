@@ -17,6 +17,8 @@ Read this page only. Open **one** row for the task. Human docs: [README.md](../R
 | Stack and layout (router) | [specs/TECH.md](specs/TECH.md) |
 | Module map (single library) | [specs/CAPABILITY_MAP.md](specs/CAPABILITY_MAP.md) |
 | Shim invariants agents must preserve | [specs/shim-behavior.md](specs/shim-behavior.md) |
+| Every `mysql_*` method (agent registry) | [knowledge/concepts/mysql-shim-method-registry.md](knowledge/concepts/mysql-shim-method-registry.md) |
+| Memory layers (OKF / SDD) | [knowledge/concepts/project-memory-model.md](knowledge/concepts/project-memory-model.md) |
 | Spec index | [specs/index.md](specs/index.md) |
 | Accepted decisions | [adrs/index.md](adrs/index.md) |
 | Validate / release checks | [runbooks/index.md](runbooks/index.md) |

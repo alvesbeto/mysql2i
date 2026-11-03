@@ -8,14 +8,30 @@ tags: [behavior, mysql-shim]
 
 Source of truth for code: `src/mysql2i.class.php`, `src/mysql2i.func.php`. This page is the **agent-facing** summary.
 
+**Per-method catalog** (all 47 functions, line anchors, func-layer guards): [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md).
+
 ## Connection
 
 | Invariant | Detail |
 |-----------|--------|
 | Current link | `mysql2i::$currObj` set by `mysql_connect` / `mysql_pconnect` |
 | After `mysql_select_db` | When `$link` is passed and valid, updates `$currObj` (legacy implicit `mysql_*` calls) |
-| Charset | `utf8mb4` on successful connect (class + procedural wrapper) |
+| Charset | **No implicit charset** on connect/pconnect — same as classic `mysql_*` (consumer uses `mysql_set_charset()` or SQL) |
 | Reuse | `mysql_connect` returns existing valid `$currObj` without opening a second link |
+| `mysql_pconnect` | Does **not** reuse `$currObj`; always `mysqli_connect('p:'…)`; always assigns `$currObj` (even on failure); `$new_link` / `$client_flags` ignored in class; connect failure may `echo` error in class |
+
+## Procedural vs class (`mysql_query`)
+
+| Layer | Invalid / missing link | Empty query |
+|-------|------------------------|-------------|
+| `mysql_query()` func | `error_log` + **`trigger_error`** (No MySQL connection), `false` — does not call class | `trigger_error` (both layers) |
+| `mysql2i::mysql_query()` class | `error_log` only, `false`; also requires `isset($link->host_info)` | same warning |
+
+Func resolves `$link === null` to `$currObj`, validates, then calls class with an explicit `$link`. Direct class use skips func warnings.
+
+## `mysql_unbuffered_query`
+
+Func is a **thin delegate** (no extra guards). Class sets `$link = $currObj` when empty, then `mysqli_query(..., MYSQLI_USE_RESULT)` with **no** connect/query empty checks (unlike `mysql_query`). Invalid link behavior depends on mysqli/PHP.
 
 ## `mysql_close`
 
@@ -26,7 +42,7 @@ Does not aggressively close the socket; returns `true` for compatibility with sh
 | Function | Behavior |
 |----------|----------|
 | `mysql_errno` / `mysql_error` | Resolve link via `resolveMysqliLink`; safe defaults when no link |
-| `mysql_query` | Fails with warning + `error_log` when link invalid |
+| `mysql_query` | Func: warning + `error_log` when link invalid; class: `error_log` only + `host_info` check — see **Procedural vs class** above |
 | `mysql_is_valid_link` | Accepts `mysqli` with `host_info` or legacy `resource` |
 
 ## Extensions (beyond classic mysql)
@@ -52,4 +68,4 @@ Does not aggressively close the socket; returns `true` for compatibility with sh
 - Prepared statements wrapper
 - Connection config from env files
 
-When adding a **new** public `mysql_*` shim, update [../../docs/API.md](../../docs/API.md) and this file in the same change.
+When adding a **new** public `mysql_*` shim, update [../../docs/API.md](../../docs/API.md), [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md), and this file in the same change.

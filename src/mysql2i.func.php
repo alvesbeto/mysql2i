@@ -57,13 +57,7 @@ if (!function_exists('mysql_affected_rows')) {
 
     function mysql_connect($host = '', $username = '', $passwd = '', $new_link = false, $client_flags = 0)
     {
-        $link = mysql2i::mysql_connect($host, $username, $passwd, $new_link, $client_flags);
-
-        if ($link && ($link instanceof mysqli)) {
-            $link->set_charset("utf8mb4");
-        }
-
-        return $link;
+        return mysql2i::mysql_connect($host, $username, $passwd, $new_link, $client_flags);
     }
 
     function mysql_create_db($database_name, $link = null)

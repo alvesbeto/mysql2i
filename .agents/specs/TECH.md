@@ -24,7 +24,7 @@ No Docker or database in this repo. Consumers bring their own MySQL/MariaDB.
 | `src/mysql2i.func.php` | Global `mysql_*` functions + `MYSQL_*` constants |
 | `docs/API.md` | Human API reference (not duplicated in `.agents/`) |
 | `README.md` | Install and usage |
-| `.agents/` | Agent context (this tree) |
+| `.agents/` | Agent context (OKF + SDD; method registry in knowledge) |
 
 ## Autoload
 
@@ -55,4 +55,4 @@ php -r "require 'vendor/autoload.php'; var_dump(function_exists('mysql_connect')
 
 No PHPUnit suite yet. Adding tests is ASK FIRST unless the user requests them.
 
-Module map: [CAPABILITY_MAP.md](CAPABILITY_MAP.md).
+Agent memory: [../knowledge/index.md](../knowledge/index.md). Module map: [CAPABILITY_MAP.md](CAPABILITY_MAP.md).

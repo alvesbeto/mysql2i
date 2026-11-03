@@ -6,7 +6,11 @@ tags: [product, behavior]
 
 # Product — current behavior
 
-Composer package **alvesbeto/mysql2i**: legacy **`mysql_*`** API for PHP 8+ applications that have not migrated to PDO/mysqli/prepared statements yet.
+Composer package **alvesbeto/mysql2i**: legacy **`mysql_*`** API for PHP 8+ — **mysqli delegation only**, no connection policy (charset, time zone, SQL modes) imposed by the library.
+
+## Product principle
+
+The installer’s application owns connection settings. This package registers `mysql_*` globals and maps them to `mysqli_*`; it does not call `set_charset`, `SET NAMES`, or similar unless the app does via the same public APIs (`mysql_set_charset`, `mysql_query`, etc.).
 
 ## Consumers
 
@@ -22,6 +26,7 @@ Do not duplicate long prose here.
 | Topic | Spec |
 |-------|------|
 | Shim invariants (charset, close, deprecations) | [shim-behavior.md](shim-behavior.md) |
+| Every `mysql_*` method (agent registry) | [../knowledge/concepts/mysql-shim-method-registry.md](../knowledge/concepts/mysql-shim-method-registry.md) |
 | Function list (human reference) | [../../docs/API.md](../../docs/API.md) |
 | Install and examples | [../../README.md](../../README.md) |
 

@@ -3,7 +3,7 @@ type: Concept
 title: Agent context taxonomy
 description: How .agents/ folders relate; read once when lost in the tree.
 generated:
-  at: 2026-11-03T15:20:00-03:00
+  at: 2026-11-03T16:45:00-03:00
   by: process:agent
 sources:
   - id: adr-0001
@@ -24,6 +24,7 @@ Use when you need a **single** overview. Do not load every folder.
 2. [index.md](../../index.md) — **one row**.
 3. [skills/mysql2i/SKILL.md](../../skills/mysql2i/SKILL.md) — routine edits.
 4. [skills/sdd/SKILL.md](../../skills/sdd/SKILL.md) — ambiguous or breaking work.
+5. [knowledge/concepts/mysql-shim-method-registry.md](../concepts/mysql-shim-method-registry.md) — per-method shim detail.
 
 ## Categories
 
@@ -31,6 +32,8 @@ Use when you need a **single** overview. Do not load every folder.
 |----------|------|-----------|
 | Code constraints | `rules/` | Editing `src/` |
 | Behavior | `specs/shim-behavior.md` | Changing shim semantics |
+| Method catalog | `knowledge/concepts/mysql-shim-method-registry.md` | Implementing or reviewing a specific `mysql_*` |
+| Memory map | `knowledge/concepts/project-memory-model.md` | Unsure where to write a fact |
 | Routers | `specs/PRODUCT.md`, `TECH.md`, `CAPABILITY_MAP.md` | Orienting only |
 | Decisions | `adrs/` | Why structure is fixed |
 | Operations | `runbooks/` | Verify before done |
@@ -40,7 +43,7 @@ Use when you need a **single** overview. Do not load every folder.
 
 ## Low-context rule
 
-- Human-long API: [docs/API.md](../../../docs/API.md) — agents read [specs/shim-behavior.md](../../specs/shim-behavior.md) instead unless adding symbols.
+- Human-long API: [docs/API.md](../../../docs/API.md) — agents use [mysql-shim-method-registry.md](../concepts/mysql-shim-method-registry.md) + [specs/shim-behavior.md](../../specs/shim-behavior.md) unless adding symbols.
 - No schema in this repo.
 - Sub-indexes have no OKF frontmatter; root + `knowledge/index.md` declare `okf_version`.
 

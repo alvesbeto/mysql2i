@@ -64,10 +64,6 @@ class mysql2i
         self::$currObj = $link;
         self::$isClosing = false;
 
-        if ($link && ($link instanceof mysqli) && !$link->connect_errno) {
-            $link->set_charset("utf8mb4");
-        }
-
         return $link;
     }
 
@@ -506,11 +502,6 @@ class mysql2i
             $errorMsg = mysqli_connect_error();
             error_log('MySQL Persistent Connection Error: ' . $errorMsg);
             echo $errorMsg . '<br>';
-        } else {
-            // Set charset on persistent connections as well.
-            if ($link instanceof mysqli) {
-                $link->set_charset("utf8mb4");
-            }
         }
         self::$currObj = $link;
 
