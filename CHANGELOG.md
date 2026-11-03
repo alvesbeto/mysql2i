@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2026-11-03
+
+### Fixed
+
+- `mysql_select_db`: when a valid `$link` is passed, set `mysql2i::$currObj` so implicit `mysql_*` calls match legacy shims (e.g. lesha888/mysql2i).
+
 ## [1.0.0] - 2026-11-03
 
 ### Added

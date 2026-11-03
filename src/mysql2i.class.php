@@ -599,6 +599,8 @@ class mysql2i
     {
         if (empty($link)) {
             $link = self::$currObj;
+        } elseif ($link instanceof mysqli && !$link->connect_errno) {
+            self::$currObj = $link;
         }
 
         if (!$link || !($link instanceof mysqli)) {

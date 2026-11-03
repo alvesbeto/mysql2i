@@ -13,6 +13,7 @@ Source of truth for code: `src/mysql2i.class.php`, `src/mysql2i.func.php`. This 
 | Invariant | Detail |
 |-----------|--------|
 | Current link | `mysql2i::$currObj` set by `mysql_connect` / `mysql_pconnect` |
+| After `mysql_select_db` | When `$link` is passed and valid, updates `$currObj` (legacy implicit `mysql_*` calls) |
 | Charset | `utf8mb4` on successful connect (class + procedural wrapper) |
 | Reuse | `mysql_connect` returns existing valid `$currObj` without opening a second link |
 

@@ -124,6 +124,8 @@ mysql_query("SET time_zone = '-03:00'"); // uses $link via $currObj
 
 If your app keeps the link in a variable (for example `$conMy01_0`), pass it explicitly: `mysql_query($sql, $conMy01_0)`.
 
+Calling `mysql_select_db($database, $link)` with an explicit connection also updates `$currObj`, so the next `mysql_query($sql)` without a link uses that same connection.
+
 ---
 
 ## Migrating from copied shim files

@@ -20,7 +20,7 @@ Persistent connection (`p:` host prefix). Emits `E_USER_DEPRECATED`. Sets `utf8m
 
 ### `mysql_select_db($dbname, $link = null)`
 
-Selects a database with `mysqli_select_db`. Returns `false` if the link or database name is empty.
+Selects a database with `mysqli_select_db`. When `$link` is a connected `mysqli`, updates `mysql2i::$currObj` so later calls without `$link` use that connection (legacy behavior). Returns `false` if the link or database name is empty.
 
 ### `mysql_close($link = null)`
 
